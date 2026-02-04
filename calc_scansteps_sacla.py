@@ -49,9 +49,9 @@ def InsertText():
         text.insert(END, "########################################################\n")
         text.insert(END, "E0 = 6555\n")
         text.insert(END, "t0 = 0\n")
-        text.insert(END, "6530, 6537, 1 1\n")
-        text.insert(END, "6537, 6545, 0.5 1\n")
-        text.insert(END, "6545, 6575, 1 1\n")
+        text.insert(END, "6530, 6537, 1, 1\n")
+        text.insert(END, "6537, 6545, 0.5, 1\n")
+        text.insert(END, "6545, 6575, 1, 1\n")
         text.insert(END, "out=mn_xanes_wth_delay\n")
 
 
