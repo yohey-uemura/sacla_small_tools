@@ -1,8 +1,8 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import math, re
 from tkinter import *
 
-mw = Tk('')
+mw = Tk()
 mw.title('Custom Param. Editor')
 
 buttonframe = Frame(mw)
@@ -14,44 +14,44 @@ def InsertText():
     text.delete('1.0',END)
     if selected.get() =='Eng':
         text.insert(END,"########################################################\n")
-        text.insert(END,"#     how to write: 'start', 'end', 'step'             #\n")
+        text.insert(END,"#     how to write: 'start', 'end', 'step, duplication'    #\n")
         text.insert(END,"#            <Example (for Energy in eV)>             #\n")
-        text.insert(END,"#                7110, 7160, 1  <= 'start', 'end', 'step' #\n")
+        text.insert(END,"#                7110, 7160, 1, 1  <= 'start', 'end', 'step', 'dupl.' #\n")
         text.insert(END,"#                out=fe_xanes   <= output file name       #\n")
         text.insert(END,"########################################################\n")
-        text.insert(END,"6530, 6537, 1\n")
-        text.insert(END,"6537, 6545, 0.5\n")
-        text.insert(END,"6545, 6575, 1\n")
+        text.insert(END,"6530, 6537, 1, 1\n")
+        text.insert(END,"6537, 6545, 0.5, 1\n")
+        text.insert(END,"6545, 6575, 1, 1\n")
         text.insert(END,"out=mn_xanes\n")
     elif selected.get() == 'Dly':
         text.insert(END,"########################################################\n")
-        text.insert(END,"#     how to write: 'start', 'end', 'step'             #\n")
+        text.insert(END,"#     how to write: 'start', 'end', 'step, duplication'    #\n")
         text.insert(END,"#             <Example (for delay in ps)>              #\n")
-        text.insert(END,"#"+f"{'t0 = 100 (in \"pls\") ':^54}"+"\n#")
-        text.insert(END,"#"+f"{'-5,-1,1 <= start, end, step':^54}"+"\n#")
-        text.insert(END,"#"+f"{'-1,1,0.1':^54}"+"\n#")
-        text.insert(END,"#"+f"{'1,5,1':^54}"+"\n#")
-        text.insert(END,"#"+f"{'out=fe_delay <=  output file name':^54}"+"\n#")
+        text.insert(END,"#"+"t0 = 100 (in pls) "+"\n#")
+        text.insert(END,"#"+"'-5,-1,1 <= start, end, step, dupl."+"\n#")
+        text.insert(END,"#"+"'-1,1,0.1"+"\n#")
+        text.insert(END,"#"+"'1,5,1'"+"\n#")
+        text.insert(END,"#"+"{'out=fe_delay <=  output file name'}"+"\n#")
         text.insert(END,"########################################################\n")
-        text.insert(END,"t0 = -300\n")
-        text.insert(END,"-5,-1,1\n")
-        text.insert(END,"-1,1,0.1\n")
-        text.insert(END,"1,5.1,1\n")
+        text.insert(END,"t0 = 0\n")
+        text.insert(END,"-5,-1,1, 1\n")
+        text.insert(END,"-1,1,0.1, 1\n")
+        text.insert(END,"1,5.1,1, 1\n")
         text.insert(END,"out=test_delay\n")
     elif selected.get() == 'Eng_with_D':
         text.insert(END, "########################################################\n")
-        text.insert(END, "#     how to write: 'start', 'end', 'step'             #\n")
+        text.insert(END, "#     how to write: 'start', 'end', 'step, duplication'             #\n")
         text.insert(END, "#          <Example (for Energy in eV)>             #\n")
         text.insert(END, "#          E0 = 7120 ( in \"eV\")                    #\n")
         text.insert(END, "#          t0 = 100 (in \"pls\")                     #\n")
-        text.insert(END, "#       7110, 7160, 1  <= 'start', 'end', 'step'     #\n")
+        text.insert(END, "#       7110, 7160, 1  <= 'start', 'end', 'step', 'dupl.'     #\n")
         text.insert(END, "#        out=fe_xanes_wth_delay   <= output file name   #\n")
         text.insert(END, "########################################################\n")
-        text.insert(END, "E0 = 6558\n")
-        text.insert(END, "t0 = 100\n")
-        text.insert(END, "6530, 6537, 1\n")
-        text.insert(END, "6537, 6545, 0.5\n")
-        text.insert(END, "6545, 6575, 1\n")
+        text.insert(END, "E0 = 6555\n")
+        text.insert(END, "t0 = 0\n")
+        text.insert(END, "6530, 6537, 1 1\n")
+        text.insert(END, "6537, 6545, 0.5 1\n")
+        text.insert(END, "6545, 6575, 1 1\n")
         text.insert(END, "out=mn_xanes_wth_delay\n")
 
 
@@ -86,10 +86,10 @@ def make_params():
             if re.match(r'^#.+',l.rstrip()):
                 pass
             elif re.match(r'^\d+.+',l.rstrip()):
-                start, end, step = [float(v) for v in l.split(',')]
+                start, end, step, dupl = [float(v) for v in l.split(',')]
                 i = 0
                 while end > start + step*i:
-                    params.append(start+step*i)
+                    params += [start+step*i]*int(dupl)
                     i += 1
             elif re.match(r'^(out=)\s*.+',l.rstrip()):
                 fn = (l.split('=')[1])
@@ -106,8 +106,8 @@ def make_params():
         f.write('bl3_st1_pm003,	bl3_st1_pm005\n')
         for i, v in enumerate(CC):
             _e = params[i]
-            txt+= f'{_e:.1f}, {v:d}, {-v:d}\n'
-            f.write(f'{v:d}, {-v:d}\n')
+            txt+= "{:.2f}, {:d}, {:d}\n".format(_e,v,-v)
+            f.write('{:d}, {:d}\n'.format(v,-v))
         f.close()
         out.insert(END,txt)
 
@@ -115,18 +115,18 @@ def make_params():
         for l in tinput:
             if re.match(r'^#.+',l.rstrip()):
                 pass
-            elif re.match(r'^t0\s*=\s*-?\d+.\d+',l.rstrip()):
+            elif re.match(r'^t0\s*=\s*-?\d*\.?\d*',l.rstrip()):
                 t0 = int(l.rstrip().split('=')[-1])
             elif re.match(r'^-?\d+.+',l.rstrip()):
-                start, end, step = [float(v) for v in l.split(',')]
+                start, end, step, dupl = [float(v) for v in l.split(',')]
                 i = 0
                 if step > 0:
                     while end > start + step*i:
-                        params.append((start+step*i))
+                        params += [start+step*i]*int(dupl)
                         i += 1
                 else:
                     while end < start + step*i:
-                        params.append((start+step*i))
+                        params += [start+step*i]*int(dupl)
                         i += 1
             elif re.match(r'^(out=)\s*.+',l.rstrip()):
                 fn = (l.split('=')[1])
@@ -140,10 +140,10 @@ def make_params():
             f = open(fn,'w')
         else:
             f = open(fn+'.csv','w')
-        f.write('bl3_st2_pm001')
+        f.write('bl3_st2_pm001\n')
         for k, v in enumerate(MOTORS):
-            f.write(f'{v:d}\n')
-            txt+= f'{DELAYS[k]:.2f}, {v:d}\n'
+            f.write('{:d}\n'.format(v))
+            txt+= '{:.2f}, {:d}\n'.format(DELAYS[k],v)
         f.close()
         out.insert(END,'DELAY(ps) MOTOR(pls)\n')
         out.insert(END,txt)
@@ -158,13 +158,13 @@ def make_params():
                 pass
             elif re.match(r'^E0\s*=\s*\d+.\d+', l.rstrip()):
                 E0 = float(l.rstrip().split('=')[-1])
-            elif re.match(r'^t0\s*=\s*\d+.\d+', l.rstrip()):
+            elif re.match(r'^t0\s*=\s*-?\d*\.?\d*', l.rstrip()):
                 t0 = int(l.rstrip().split('=')[-1])
             elif re.match(r'^\d+.+', l.rstrip()):
-                start, end, step = [float(v) for v in l.split(',')]
+                start, end, step, dupl = [float(v) for v in l.split(',')]
                 i = 0
                 while end > start + step * i:
-                    params.append(start + step * i)
+                    params += [start+step*i]*int(dupl)
                     i += 1
             elif re.match(r'^(out=)\s*.+', l.rstrip()):
                 fn = (l.split('=')[1])
@@ -178,7 +178,7 @@ def make_params():
         dist_at_e0 = 2*2*d*math.sin(Ang_e0/180*math.pi)
         diffs = [x - dist_at_e0 for x in dist]
         delays_in_fs = [round(x/c*1e15,1) for x in diffs]
-        c_delay_positions = [int(x/1000*150)+t0 for x in delays_in_fs]
+        c_delay_positions = [-int(x/1000*150)+t0 for x in delays_in_fs]
 
         # print (CC)
         txt = '#Eng(eV), CCpos, CCneg, delay(pls)\n'
@@ -190,8 +190,8 @@ def make_params():
         for i,v in enumerate(CC):
             _delay = c_delay_positions[i]
             eng = params[i]
-            txt += f'{eng:.1f}, {v:d}, {-v:d}, {_delay:d}\n'
-            f.write(f'{v:d}, {-v:d}, {_delay:d}\n')
+            txt += '{:.2f}, {:d}, {:d}, {:d}\n'.format(eng,v,-v,_delay)
+            f.write('{:d}, {:d}, {:d}\n'.format(v,-v,_delay))
         f.close()
         out.insert(END, txt)
 
